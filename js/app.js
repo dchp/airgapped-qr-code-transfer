@@ -14,8 +14,8 @@
 
     sender_panel.hidden = !is_sender;
     receiver_panel.hidden = is_sender;
-    mode_sender_btn.classList.toggle("active", is_sender);
-    mode_receiver_btn.classList.toggle("active", !is_sender);
+    mode_sender_btn.setAttribute("aria-pressed", String(is_sender));
+    mode_receiver_btn.setAttribute("aria-pressed", String(!is_sender));
 
     const url = new URL(window.location.href);
     url.searchParams.set("mode", mode);

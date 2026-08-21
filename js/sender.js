@@ -62,7 +62,11 @@ QrTransfer.createSender = () => {
 
   const ensureReady = () => {
     if (qrcode_ready) return;
-    let lowest_size = Math.min(window.innerWidth, window.innerHeight) / 1.5;
+    const host = document.getElementById("qrcode");
+    const available_width = host.parentElement
+      ? host.parentElement.clientWidth
+      : window.innerWidth;
+    const lowest_size = Math.min(available_width, window.innerHeight) / 1.5;
     qrcode_object = new QRCode("qrcode", {
       text: IDLE_MESSAGE,
       width: lowest_size,
@@ -76,6 +80,11 @@ QrTransfer.createSender = () => {
   };
 
   const bind = () => {
+    const file_input = document.getElementById("file_input");
+    const file_name = document.getElementById("file_name");
+    file_input.addEventListener("change", () => {
+      file_name.textContent = file_input.files[0]?.name || "No file chosen";
+    });
     transfer_btn.addEventListener("click", () => {
       if (is_transferring) stop();
       else start();

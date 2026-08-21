@@ -9,23 +9,28 @@
 	</head>
 
 	<body>
-		<div id="app">
+		<div id="app" class="container">
 			<div
 				class="flex flex-col items-start w-full items-center justify-center align-middle"
 			>
-				<div class="flex flex-row gap-2 my-4">
-					<div class="text-xl mb-4">Data Mode:</div>
+				<div
+					class="mode-switcher my-4"
+					role="group"
+					aria-label="Transfer mode"
+				>
 					<button
+						type="button"
 						id="mode_sender_btn"
-						class="mode-btn p-1 border-2 border-gray-500"
+						aria-pressed="true"
 					>
-						Sender
+						Sender Mode
 					</button>
 					<button
+						type="button"
 						id="mode_receiver_btn"
-						class="mode-btn p-1 border-2 border-gray-500"
+						aria-pressed="false"
 					>
-						Receiver
+						Receiver Mode
 					</button>
 				</div>
 
@@ -36,20 +41,27 @@
 					<div id="sender_message" class="text-sm mb-4">
 						Choose file to get started
 					</div>
-					<div class="w-1/2 mb-4">
+					<div class="file-field mb-4">
 						<input
-							class="block w-full text-sm text-gray-900 border border-gray-300 cursor-pointer bg-gray-50 focus:outline-none"
 							id="file_input"
+							class="file-input-native"
 							type="file"
 						/>
+						<label class="file-picker" for="file_input">
+							<span class="file-picker-button">Choose file</span>
+							<span class="file-picker-name" id="file_name"
+								>No file chosen</span
+							>
+						</label>
 					</div>
 					<button
+						type="button"
 						id="transfer_btn"
-						class="mb-6 p-1 border-2 border-gray-500"
+						class="action-btn mb-6"
 					>
 						Start Transfer
 					</button>
-					<div id="qrcode" class=""></div>
+					<div id="qrcode"></div>
 				</div>
 
 				<div
@@ -64,8 +76,9 @@
 						Progress: 0 / 0
 					</div>
 					<button
+						type="button"
 						id="receiver_btn"
-						class="mb-6 p-1 border-2 border-gray-500"
+						class="action-btn mb-6"
 					>
 						Start Receiver
 					</button>
