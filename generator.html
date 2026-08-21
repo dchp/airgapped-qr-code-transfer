@@ -13,7 +13,7 @@
         class="flex flex-col items-start w-full items-center justify-center align-middle"
       >
         <div class="text-xl my-4">Data Sender Mode</div>
-        <div class="text-sm mb-4">{{user_message}}</div>
+        <div id="user_message" class="text-sm mb-4">Choose file to get started</div>
         <div class="w-1/2 mb-4">
           <input
             class="block w-full text-sm text-gray-900 border border-gray-300 cursor-pointer bg-gray-50 focus:outline-none"
@@ -22,32 +22,21 @@
           />
         </div>
         <button
-          v-if="!is_transferring"
-          v-on:click="start_transfer"
+          id="transfer_btn"
           class="mb-6 p-1 border-2 border-gray-500"
         >
           Start Transfer
         </button>
-        <button
-          v-else
-          v-on:click="stop_transfer"
-          class="mb-6 p-1 border-2 border-gray-500"
-        >
-          Stop Transfer
-        </button>
         <div id="qrcode" class=""></div>
       </div>
     </div>
-    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pako/2.0.3/pako.min.js"></script>
     <script>
-      const { createApp, ref, onMounted } = Vue;
-
-      createApp({
-        setup() {
-          const user_message = ref("Choose file to get started");
-          const is_transferring = ref(false);
+      (() => {
+          const user_message = document.getElementById("user_message");
+          const transfer_btn = document.getElementById("transfer_btn");
+          let is_transferring = false;
           const chunk_size = 250;
           let qrcode_object = "";
 
@@ -62,13 +51,15 @@
           };
 
           const stop_transfer = () => {
-            is_transferring.value = false;
-            user_message.value = "Choose file to get started";
+            is_transferring = false;
+            transfer_btn.textContent = "Start Transfer";
+            user_message.textContent = "Choose file to get started";
           };
 
           const start_transfer = async () => {
             let file_input = document.getElementById("file_input");
-            is_transferring.value = true;
+            is_transferring = true;
+            transfer_btn.textContent = "Stop Transfer";
             let file = file_input.files[0];
             let data_chunks = [];
             let data_array = pako.gzip(await file.arrayBuffer(), { level: 9 });
@@ -76,7 +67,7 @@
             let file_metadata = { name: file.name, chunks: total_chunks };
             qrcode_object.clear();
             qrcode_object.makeCode(JSON.stringify(file_metadata));
-            user_message.value = "Starting data transfer in few seconds ...";
+            user_message.textContent = "Starting data transfer in few seconds ...";
             await new Promise((r) => setTimeout(r, 1000));
             for (let i = 0; i < total_chunks; i++) {
               await new Promise((r) => setTimeout(r, 50));
@@ -85,9 +76,9 @@
               let encoded_data = encode_data(i, chunk);
               qrcode_object.clear();
               qrcode_object.makeCode(encoded_data);
-              user_message.value = `Transfering Chunk ${i}/${total_chunks} ...`;
-              if (!is_transferring.value) {
-                user_message.value = "Choose file to get started";
+              user_message.textContent = `Transfering Chunk ${i}/${total_chunks} ...`;
+              if (!is_transferring) {
+                user_message.textContent = "Choose file to get started";
                 qrcode_object.clear();
                 qrcode_object.makeCode("Choose file to get started");
                 break;
@@ -96,7 +87,7 @@
             stop_transfer();
           };
 
-          onMounted(() => {
+          document.addEventListener("DOMContentLoaded", () => {
             console.log("Application Initialized ...");
             let lowest_size =
               Math.min(window.innerWidth, window.innerHeight) / 1.5;
@@ -109,16 +100,12 @@
               colorLight: "#ffffff",
               correctLevel: QRCode.CorrectLevel.M,
             });
+            transfer_btn.addEventListener("click", () => {
+              if (is_transferring) stop_transfer();
+              else start_transfer();
+            });
           });
-
-          return {
-            user_message,
-            start_transfer,
-            stop_transfer,
-            is_transferring,
-          };
-        },
-      }).mount("#app");
+      })();
     </script>
   </body>
 </html>

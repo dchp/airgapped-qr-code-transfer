@@ -1,6 +1,6 @@
 # Airgapped QR Code Transfer Web App
 
-Airgapped QR Code Transfer is a simple web-based tool to transfer data between devices using QR codes. It allows for the transfer of files without the need for network connectivity, leveraging QR codes to encode and decode file data. This project uses Vue.js for the frontend and libraries like pako for compression, qrcode.js for QR code generation, and zbar-wasm for QR code scanning.
+Airgapped QR Code Transfer is a simple web-based tool to transfer data between devices using QR codes. It allows for the transfer of files without the need for network connectivity, leveraging QR codes to encode and decode file data. This project uses plain JavaScript for the frontend and libraries like pako for compression, qrcode.js for QR code generation, and zbar-wasm for QR code scanning.
 
 [![Open in Flexpilot AI Web IDE](https://badges.flexpilot.ai/open-in-web-ide.svg)](https://flexpilot.ai/web-ide-redirect?provider=github&owner=mohankumarelec&repo=airgapped-qr-code-transfer&branch=master)
 
@@ -105,7 +105,6 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## Acknowledgments
 
-- [Vue.js](https://vuejs.org/) - JavaScript framework for building user interfaces.
 - [pako](https://github.com/nodeca/pako) - Compression library.
 - [qrcode.js](https://github.com/davidshimjs/qrcodejs) - QR code generation library.
 - [zbar-wasm](https://github.com/undecaf/zbar-wasm) - QR code scanning library.

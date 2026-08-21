@@ -13,42 +13,37 @@
         class="flex flex-col items-start w-full items-center justify-center align-middle"
       >
         <div class="text-xl my-4">Data Receiver Mode</div>
-        <div class="text-sm mb-4">{{user_message}}</div>
-        <div class="text-sm mb-4">
-          Progress: {{Object.keys(decoded_chunks).length}} /
-          {{file_metadata.chunks || 0}}
+        <div id="user_message" class="text-sm mb-4">Click receive button to start receiving</div>
+        <div id="progress" class="text-sm mb-4">
+          Progress: 0 /
+          0
         </div>
         <button
-          v-if="!is_receiving"
-          v-on:click="start_receiver"
+          id="receiver_btn"
           class="mb-6 p-1 border-2 border-gray-500"
         >
           Start Receiver
         </button>
-        <button
-          v-else
-          v-on:click="stop_receiver"
-          class="mb-6 p-1 border-2 border-gray-500"
-        >
-          Stop Receiver
-        </button>
         <video id="videoElement" muted autoplay playsinline></video>
       </div>
     </div>
-    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@undecaf/zbar-wasm@latest/dist/index.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pako/2.0.3/pako.min.js"></script>
     <script>
-      const { createApp, ref, reactive, onMounted, computed } = Vue;
-
-      createApp({
-        setup() {
-          const user_message = ref("Click receive button to start receiving");
-          const decoded_chunks = ref({});
-          const total_chunks = ref(-1);
-          const file_metadata = reactive({});
-          const is_receiving = ref(false);
+      (() => {
+          const user_message = document.getElementById("user_message");
+          const progress = document.getElementById("progress");
+          const receiver_btn = document.getElementById("receiver_btn");
+          let decoded_chunks = {};
+          const total_chunks = -1;
+          let file_metadata = {};
+          let is_receiving = false;
           let canvas, context, videoElement;
+
+          const update_progress = () => {
+            progress.textContent =
+              `Progress: ${Object.keys(decoded_chunks).length} / ${file_metadata.chunks || 0}`;
+          };
 
           const decode_data = (input_string) => {
             const encoded_data = atob(input_string.split(",")[1]);
@@ -79,17 +74,21 @@
           };
 
           const stop_receiver = () => {
-            is_receiving.value = false;
-            decoded_chunks.value = {};
+            is_receiving = false;
+            receiver_btn.textContent = "Start Receiver";
+            decoded_chunks = {};
             Object.assign(file_metadata, {});
-            user_message.value = "Click receive button to start receiving";
+            update_progress();
+            user_message.textContent = "Click receive button to start receiving";
           };
 
           const start_receiver = async () => {
-            decoded_chunks.value = {};
-            is_receiving.value = true;
+            decoded_chunks = {};
+            is_receiving = true;
+            receiver_btn.textContent = "Stop Receiver";
+            update_progress();
             while (
-              file_metadata.chunks != Object.keys(decoded_chunks.value).length
+              file_metadata.chunks != Object.keys(decoded_chunks).length
             ) {
               try {
                 await new Promise((r) => setTimeout(r, 10));
@@ -107,27 +106,30 @@
                 let decoded_data = symbols[0].decode();
                 if (decoded_data.includes("chunks")) {
                   Object.assign(file_metadata, JSON.parse(decoded_data));
-                  decoded_chunks.value = {};
-                  user_message.value = `Transferring file: ${file_metadata.name}`;
+                  decoded_chunks = {};
+                  user_message.textContent = `Transferring file: ${file_metadata.name}`;
+                  update_progress();
                 } else if (decoded_data.split(",").length == 2) {
                   let raw_data = decode_data(decoded_data);
-                  decoded_chunks.value[raw_data["index"]] = raw_data["data"];
+                  decoded_chunks[raw_data["index"]] = raw_data["data"];
+                  update_progress();
                 }
-                window.decoded_chunks = decoded_chunks.value;
+                window.decoded_chunks = decoded_chunks;
               } catch (error) {
                 console.error("Error in Loop: ", error);
               }
-              if (!is_receiving.value) {
+              if (!is_receiving) {
                 Object.assign(file_metadata, {});
-                decoded_chunks.value = {};
-                user_message.value = "Click receive button to start receiving";
+                decoded_chunks = {};
+                update_progress();
+                user_message.textContent = "Click receive button to start receiving";
                 return true;
               }
             }
-            user_message.value = "Data Transfer Complete";
+            user_message.textContent = "Data Transfer Complete";
             output_array = [];
             for (let i = 0; i < file_metadata.chunks; i++) {
-              output_array = output_array.concat(decoded_chunks.value[i]);
+              output_array = output_array.concat(decoded_chunks[i]);
             }
             let output_unit8array = Uint8Array.from(output_array);
             window.output_unit8array = output_unit8array;
@@ -136,7 +138,7 @@
             stop_receiver();
           };
 
-          onMounted(async () => {
+          document.addEventListener("DOMContentLoaded", async () => {
             console.log("Application Initialized ...");
             videoElement = document.getElementById("videoElement");
             videoElement.srcObject = await navigator.mediaDevices.getUserMedia({
@@ -148,18 +150,12 @@
             canvas.height = videoElement.videoHeight;
             canvas.width = videoElement.videoWidth;
             context.drawImage(videoElement, 0, 0);
+            receiver_btn.addEventListener("click", () => {
+              if (is_receiving) stop_receiver();
+              else start_receiver();
+            });
           });
-
-          return {
-            user_message,
-            start_receiver,
-            is_receiving,
-            file_metadata,
-            decoded_chunks,
-            stop_receiver,
-          };
-        },
-      }).mount("#app");
+      })();
     </script>
   </body>
 </html>
