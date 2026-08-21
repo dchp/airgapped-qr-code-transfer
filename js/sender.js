@@ -1,6 +1,7 @@
 window.QrTransfer = window.QrTransfer || {};
 
 QrTransfer.createSender = () => {
+  const IDLE_MESSAGE = "Choose file to get started";
   const sender_message = document.getElementById("sender_message");
   const transfer_btn = document.getElementById("transfer_btn");
   let is_transferring = false;
@@ -8,17 +9,24 @@ QrTransfer.createSender = () => {
   let qrcode_object = null;
   let qrcode_ready = false;
 
+  const reset_qrcode = () => {
+    if (!qrcode_object) return;
+    qrcode_object.clear();
+    qrcode_object.makeCode(IDLE_MESSAGE);
+  };
+
   const stop = () => {
     is_transferring = false;
     transfer_generation += 1;
     transfer_btn.textContent = "Start Transfer";
-    sender_message.textContent = "Choose file to get started";
+    sender_message.textContent = IDLE_MESSAGE;
+    reset_qrcode();
   };
 
   const start = async () => {
     let file_input = document.getElementById("file_input");
     if (!file_input.files[0]) {
-      sender_message.textContent = "Choose file to get started";
+      sender_message.textContent = IDLE_MESSAGE;
       return;
     }
     const generation = ++transfer_generation;
@@ -56,7 +64,7 @@ QrTransfer.createSender = () => {
     if (qrcode_ready) return;
     let lowest_size = Math.min(window.innerWidth, window.innerHeight) / 1.5;
     qrcode_object = new QRCode("qrcode", {
-      text: "Choose file to get started",
+      text: IDLE_MESSAGE,
       width: lowest_size,
       height: lowest_size,
       typeNumber: 40,
