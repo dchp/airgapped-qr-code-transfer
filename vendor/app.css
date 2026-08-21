@@ -22,3 +22,9 @@
 .bg-gray-50 { background-color: #f9fafb; }
 .cursor-pointer { cursor: pointer; }
 .focus\:outline-none:focus { outline: 2px solid transparent; outline-offset: 2px; }
+.flex-row { flex-direction: row; }
+.gap-2 { gap: 0.5rem; }
+.mr-2 { margin-right: 0.5rem; }
+.mode-btn { background: #fff; }
+.mode-btn.active { background: #e5e7eb; }
+[hidden] { display: none !important; }

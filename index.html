@@ -1,151 +1,84 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Airgapped QR Code Transfer</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            line-height: 1.6;
-            margin: 0;
-            padding: 0;
-            background-color: #f4f4f4;
-        }
-        .container {
-            max-width: 800px;
-            margin: 0 auto;
-            padding: 20px;
-            background-color: #fff;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-        }
-        h1, h2, h3 {
-            color: #333;
-        }
-        a {
-            color: #1a73e8;
-            text-decoration: none;
-        }
-        a:hover {
-            text-decoration: underline;
-        }
-        pre {
-            background: #eee;
-            padding: 10px;
-            overflow-x: auto;
-        }
-        code {
-            background: #eee;
-            padding: 2px 4px;
-            border-radius: 3px;
-        }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <h1>Airgapped QR Code Transfer</h1>
-        <p>Airgapped QR Code Transfer is a simple web-based tool to transfer data between devices using QR codes. It allows for the transfer of files without the need for network connectivity, leveraging QR codes to encode and decode file data. This project uses plain JavaScript for the frontend and vendored libraries (pako, qrcode.js, zbar-wasm) so the app pages run fully offline.</p>
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<meta http-equiv="X-UA-Compatible" content="ie=edge" />
+		<title>Airgapped QR Code Transfer</title>
+		<link rel="stylesheet" href="vendor/app.css" />
+	</head>
 
-        <h2>Live Online Demo</h2>
-        <h3>Receiver Setup:</h3>
-        <ul>
-            <li>Open <a href="scanner.html" target="_blank">scanner.html</a> in the receiver's browser.</li>
-            <li>Allow access to the camera for scanning.</li>
-        </ul>
+	<body>
+		<div id="app">
+			<div
+				class="flex flex-col items-start w-full items-center justify-center align-middle"
+			>
+				<div class="flex flex-row gap-2 my-4">
+					<div class="text-xl mb-4">Data Mode:</div>
+					<button
+						id="mode_sender_btn"
+						class="mode-btn p-1 border-2 border-gray-500"
+					>
+						Sender
+					</button>
+					<button
+						id="mode_receiver_btn"
+						class="mode-btn p-1 border-2 border-gray-500"
+					>
+						Receiver
+					</button>
+				</div>
 
-        <h3>Sender Setup:</h3>
-        <ul>
-            <li>Open <a href="generator.html" target="_blank">generator.html</a> in the sender's browser.</li>
-            <li>Upload the file that needs to be transferred.</li>
-        </ul>
+				<div
+					id="sender_panel"
+					class="flex flex-col items-center w-full"
+				>
+					<div id="sender_message" class="text-sm mb-4">
+						Choose file to get started
+					</div>
+					<div class="w-1/2 mb-4">
+						<input
+							class="block w-full text-sm text-gray-900 border border-gray-300 cursor-pointer bg-gray-50 focus:outline-none"
+							id="file_input"
+							type="file"
+						/>
+					</div>
+					<button
+						id="transfer_btn"
+						class="mb-6 p-1 border-2 border-gray-500"
+					>
+						Start Transfer
+					</button>
+					<div id="qrcode" class=""></div>
+				</div>
 
-        <h3>Transfer Process:</h3>
-        <ul>
-            <li>Click the "Start Receiver" button in the receiver's browser and point it to the sender's screen.</li>
-            <li>In the sender's browser, click "Choose file" and then click "Start Transfer."</li>
-            <li>Wait for all parts to be transferred. The file will be downloaded on the receiver's device.</li>
-        </ul>
-
-        <h2>Features</h2>
-        <ul>
-            <li><strong>Data Sender Mode</strong>: Allows a user to select a file, compress it, and transfer it via QR codes.</li>
-            <li><strong>Data Receiver Mode</strong>: Allows a user to scan QR codes to receive and reconstruct the file.</li>
-            <li><strong>File Compression</strong>: Uses gzip compression to reduce the size of the data being transferred.</li>
-            <li><strong>QR Code Generation and Scanning</strong>: Uses qrcode.js for generation and zbar-wasm for scanning QR codes.</li>
-        </ul>
-
-        <h2>Getting Started</h2>
-        <h3>Prerequisites</h3>
-        <p>A modern web browser (preferably Chrome or Firefox) that supports JavaScript and the WebRTC API.</p>
-
-        <h3>Installing</h3>
-        <pre><code>git clone https://github.com/mohankumarelec/airgap-qr-transfer.git
-cd airgap-qr-transfer</code></pre>
-        <p>Open the <code>generator.html</code> file in your browser for the sender interface:</p>
-        <pre><code>open generator.html</code></pre>
-        <p>Open the <code>scanner.html</code> file in your browser for the receiver interface:</p>
-        <pre><code>open scanner.html</code></pre>
-
-        <h2>Usage</h2>
-        <h3>Data Sender Mode</h3>
-        <ol>
-            <li>Open <code>generator.html</code> in your browser.</li>
-            <li>Select a file using the file input.</li>
-            <li>Click the "Start Transfer" button to begin the transfer process.</li>
-            <li>The application will compress the file, split it into chunks, and generate QR codes for each chunk.</li>
-            <li>The generated QR codes will be displayed one by one, which can be scanned by the receiving device.</li>
-        </ol>
-
-        <h3>Data Receiver Mode</h3>
-        <ol>
-            <li>Open <code>scanner.html</code> in your browser.</li>
-            <li>Click the "Start Receiver" button to begin the receiving process.</li>
-            <li>Use the device's camera to scan the QR codes generated by the sender.</li>
-            <li>The application will decode the QR codes, reconstruct the file, and prompt you to download it once the transfer is complete.</li>
-        </ol>
-
-        <h2>How It Works</h2>
-        <h3>Data Sender (generator.html)</h3>
-        <ol>
-            <li><strong>File Selection</strong>: User selects a file from their device.</li>
-            <li><strong>Compression</strong>: The file is compressed using the pako library.</li>
-            <li><strong>Chunking</strong>: The compressed file is split into smaller chunks.</li>
-            <li><strong>QR Code Generation</strong>: Each chunk is encoded into a QR code using qrcode.js.</li>
-            <li><strong>Display QR Codes</strong>: The QR codes are displayed sequentially for the receiver to scan.</li>
-        </ol>
-
-        <h3>Data Receiver (scanner.html)</h3>
-        <ol>
-            <li><strong>QR Code Scanning</strong>: The device's camera scans QR codes using zbar-wasm.</li>
-            <li><strong>Decoding</strong>: Each QR code is decoded to extract the chunk of data.</li>
-            <li><strong>Reconstruction</strong>: The chunks are reassembled into the original compressed file.</li>
-            <li><strong>Decompression</strong>: The file is decompressed using pako.</li>
-            <li><strong>File Download</strong>: The reconstructed file is made available for download.</li>
-        </ol>
-
-        <h2>Contributing</h2>
-        <p>Contributions are welcome! Please follow these steps:</p>
-        <ol>
-            <li>Fork the repository.</li>
-            <li>Create a new branch (<code>git checkout -b feature-branch</code>).</li>
-            <li>Make your changes.</li>
-            <li>Commit your changes (<code>git commit -am 'Add new feature'</code>).</li>
-            <li>Push to the branch (<code>git push origin feature-branch</code>).</li>
-            <li>Create a new Pull Request.</li>
-        </ol>
-
-        <h2>License</h2>
-        <p>This project is licensed under the MIT License - see the <a href="LICENSE">LICENSE</a> file for details.</p>
-
-        <h2>Acknowledgments</h2>
-        <ul>
-            <li><a href="https://github.com/nodeca/pako" target="_blank">pako</a> - Compression library.</li>
-            <li><a href="https://github.com/davidshimjs/qrcodejs" target="_blank">qrcode.js</a> - QR code generation library.</li>
-            <li><a href="https://github.com/undecaf/zbar-wasm" target="_blank">zbar-wasm</a> - QR code scanning library.</li>
-        </ul>
-
-        <h2>More Information</h2>
-        <p>For more information, visit the <a href="https://github.com/mohankumarelec/Airgapped-QR-code-Transfer" target="_blank">GitHub repository</a>.</p>
-    </div>
-</body>
+				<div
+					id="receiver_panel"
+					class="flex flex-col items-center w-full"
+					hidden
+				>
+					<div id="receiver_message" class="text-sm mb-4">
+						Click receive button to start receiving
+					</div>
+					<div id="progress" class="text-sm mb-4">
+						Progress: 0 / 0
+					</div>
+					<button
+						id="receiver_btn"
+						class="mb-6 p-1 border-2 border-gray-500"
+					>
+						Start Receiver
+					</button>
+					<video id="videoElement" muted autoplay playsinline></video>
+				</div>
+			</div>
+		</div>
+		<script src="vendor/qrcode.js"></script>
+		<script src="vendor/zbar-wasm.js"></script>
+		<script src="vendor/pako.min.js"></script>
+		<script src="js/codec.js"></script>
+		<script src="js/sender.js"></script>
+		<script src="js/receiver.js"></script>
+		<script src="js/app.js"></script>
+	</body>
 </html>
