@@ -1,6 +1,7 @@
 window.QrTransfer = window.QrTransfer || {};
 
 QrTransfer.createReceiver = () => {
+  const IDLE_MESSAGE = "Click receive button to start receiving";
   const receiver_message = document.getElementById("receiver_message");
   const progress = document.getElementById("progress");
   const receiver_btn = document.getElementById("receiver_btn");
@@ -51,7 +52,7 @@ QrTransfer.createReceiver = () => {
     decoded_chunks = {};
     file_metadata = {};
     update_progress();
-    receiver_message.textContent = "Click receive button to start receiving";
+    receiver_message.textContent = IDLE_MESSAGE;
   };
 
   const start = async () => {
@@ -98,8 +99,7 @@ QrTransfer.createReceiver = () => {
         file_metadata = {};
         decoded_chunks = {};
         update_progress();
-        receiver_message.textContent =
-          "Click receive button to start receiving";
+        receiver_message.textContent = IDLE_MESSAGE;
         return true;
       }
     }
@@ -131,7 +131,10 @@ QrTransfer.createReceiver = () => {
   };
 
   const ensureReady = async () => {
-    if (camera_ready) return;
+    if (camera_ready) {
+      receiver_message.textContent = IDLE_MESSAGE;
+      return;
+    }
     const generation = ++camera_generation;
     videoElement = document.getElementById("videoElement");
     let stream = null;
@@ -160,6 +163,7 @@ QrTransfer.createReceiver = () => {
       canvas.width = videoElement.videoWidth;
       context.drawImage(videoElement, 0, 0);
       camera_ready = true;
+      receiver_message.textContent = IDLE_MESSAGE;
     } catch (error) {
       release_stream(stream);
       if (camera_stream === stream) {
