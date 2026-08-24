@@ -13,8 +13,10 @@ QrTransfer.createReceiver = () => {
   let camera_stream = null;
   let camera_generation = 0;
 
-  const download_file = (data, fileName) => {
-    const blob = new Blob([data]);
+  const download_file = (data, fileName, fileType) => {
+    const blob = fileType
+      ? new Blob([data], { type: fileType })
+      : new Blob([data]);
     const dummy_element = document.createElement("a");
     const url = URL.createObjectURL(blob);
     dummy_element.href = url;
@@ -36,7 +38,8 @@ QrTransfer.createReceiver = () => {
         parsed &&
         typeof parsed === "object" &&
         typeof parsed.name === "string" &&
-        typeof parsed.chunks === "number"
+        typeof parsed.chunks === "number" &&
+        (typeof parsed.type === "string" || parsed.type === undefined)
       ) {
         return parsed;
       }
@@ -111,7 +114,7 @@ QrTransfer.createReceiver = () => {
     let output_unit8array = Uint8Array.from(output_array);
     window.output_unit8array = output_unit8array;
     let infalted_array = pako.inflate(window.output_unit8array);
-    download_file(infalted_array, file_metadata.name);
+    download_file(infalted_array, file_metadata.name, file_metadata.type);
     stop();
   };
 

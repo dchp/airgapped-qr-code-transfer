@@ -36,7 +36,11 @@ QrTransfer.createSender = () => {
     let data_array = pako.gzip(await file.arrayBuffer(), { level: 9 });
     if (generation !== transfer_generation) return;
     let total_chunks = Math.ceil(data_array.length / QrTransfer.CHUNK_SIZE);
-    let metadata = { name: file.name, chunks: total_chunks };
+    let metadata = {
+      name: file.name,
+      chunks: total_chunks,
+      type: file.type || "",
+    };
     qrcode_object.clear();
     qrcode_object.makeCode(JSON.stringify(metadata));
     sender_message.textContent = "Starting data transfer in few seconds ...";
