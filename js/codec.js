@@ -1,6 +1,7 @@
 window.QrTransfer = window.QrTransfer || {};
 
-QrTransfer.CHUNK_SIZE = 250;
+QrTransfer.CHUNK_SIZE = 200;
+QrTransfer.QR_DISPLAY_MS = 200;
 
 QrTransfer.encodeData = (index, input_bytes) => {
   let encoded_string = String.fromCharCode.apply(null, input_bytes);

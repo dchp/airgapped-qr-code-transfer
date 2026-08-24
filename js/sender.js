@@ -43,7 +43,6 @@ QrTransfer.createSender = () => {
     await new Promise((r) => setTimeout(r, 1000));
     if (generation !== transfer_generation) return;
     for (let i = 0; i < total_chunks; i++) {
-      await new Promise((r) => setTimeout(r, 50));
       if (generation !== transfer_generation) return;
       let start_offset = i * QrTransfer.CHUNK_SIZE;
       let chunk = data_array.subarray(
@@ -54,6 +53,7 @@ QrTransfer.createSender = () => {
       qrcode_object.clear();
       qrcode_object.makeCode(encoded_data);
       sender_message.textContent = `Transfering Chunk ${i}/${total_chunks} ...`;
+      await new Promise((r) => setTimeout(r, QrTransfer.QR_DISPLAY_MS));
     }
     if (generation === transfer_generation) {
       stop();
